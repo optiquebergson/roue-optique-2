@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Roue Optique Bergson</title>
+<style>
+    body {
+        background: #ffffff;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    #wheel-container {
+        position: relative;
+        width: 420px;
+        height: 420px;
+    }
+
+    #wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 12px solid #fff;
+        box-shadow: 0 0 20px rgba(0,0,0,0.15);
+        transition: transform 5s cubic-bezier(.17,.67,.12,.99);
+    }
+
+    #spin {
+        margin-top: 20px;
+        padding: 12px 25px;
+        font-size: 20px;
+        background: #e6696f;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    #arrow {
+        width: 0; 
+        height: 0; 
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-bottom: 35px solid #333;
+        position: absolute;
+        top: -40px;
+        left: calc(50% - 20px);
+        z-index: 10;
+    }
+
+    /* Pop-up */
+    #popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        display: none;
+        text-align: center;
+    }
+    #popup button {
+        margin-top: 15px;
+        padding: 10px 18px;
+        background: #5b7976;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="wheel-container">
+    <div id="arrow"></div>
+    <canvas id="wheel" width="420" height="420"></canvas>
+</div>
+
+<button id="spin">🎡 Lancer la roue</button>
+
+<div id="popup">
+    <h2 id="popup-text"></h2>
+    <button id="copy-btn">Copier le code</button>
+</div>
+
+<script>
+// --- CONFIGURATION --- //
+const prizes = [
+    { text: "30€ dès 250€", color: "#e6696f", code: "REMISE30" },
+    { text: "30€ dès 250€", color: "#e6696f", code: "REMISE30" },
+
+    { text: "-20% optique", color: "#b4c033", code: "OPTIQUE20" },
+    { text: "-20% optique", color: "#b4c033", code: "OPTIQUE20" },
+
+    { text: "-10% optique", color: "#b7d1c8", code: "OPTIQUE10" },
+    { text: "-10% optique", color: "#b7d1c8", code: "OPTIQUE10" },
+
+    { text: "Entretien gratuit", color: "#5b7976", code: "ENTRETIEN" },
+    { text: "Entretien gratuit", color: "#5b7976", code: "ENTRETIEN" }
+];
+
+// --- DESSIN DE LA ROUE --- //
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const size = canvas.width;
+const number = prizes.length;
+const arc = (2 * Math.PI) / number;
+
+function drawWheel() {
+    for (let i = 0; i < number; i++) {
+        ctx.beginPath();
+        ctx.fillStyle = prizes[i].color;
+        ctx.moveTo(size/2, size/2);
+        ctx.arc(size/2, size/2, size/2, arc*i, arc*(i+1));
+        ctx.fill();
+        ctx.save();
+
+        ctx.translate(size/2, size/2);
+        ctx.rotate(arc*i + arc/2);
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 18px Arial";
+        ctx.textAlign = "right";
+        ctx.fillText(prizes[i].text, size/2 - 20, 10);
+        ctx.restore();
+    }
+}
+drawWheel();
+
+// --- ANTI DOUBLE PARTICIPATION --- //
+if (localStorage.getItem("played") === "true") {
+    document.getElementById("spin").disabled = true;
+    document.getElementById("spin").innerText = "Déjà joué ✔️";
+}
+
+// --- SON CLIC CLIC --- //
+const clickSound = new Audio("https://www.soundjay.com/mechanical/sounds/mechanical-clonk-1.mp3");
+
+// --- SPIN --- //
+let spinning = false;
+
+document.getElementById("spin").onclick = function() {
+    if (spinning) return;
+    spinning = true;
+
+    const spins = Math.floor(Math.random() * 2000) + 2000;
+    let deg = 0;
+    let lastSector = -1;
+
+    const interval = setInterval(() => {
+        deg += 20;
+        canvas.style.transform = `rotate(${deg}deg)`;
+
+        const sector = Math.floor(((deg % 360) / 360) * number);
+        if (sector !== lastSector) {
+            clickSound.currentTime = 0;
+            clickSound.play();
+            lastSector = sector;
+        }
+
+        if (deg >= spins) {
+            clearInterval(interval);
+            result(sector);
+        }
+    }, 20);
+};
+
+// --- CONFETTIS BASIQUES --- //
+function confetti() {
+    for (let i = 0; i < 150; i++) {
+        const div = document.createElement("div");
+        div.style.position = "fixed";
+        div.style.top = "-10px";
+        div.style.left = Math.random()*100 + "%";
+        div.style.width = "8px";
+        div.style.height = "8px";
+        div.style.background = `hsl(${Math.random()*360},100%,50%)`;
+        div.style.opacity = "0.8";
+        div.style.transition = "3s";
+        document.body.appendChild(div);
+
+        setTimeout(() => {
+            div.style.top = "110%";
+            div.style.transform = "rotate(720deg)";
+        }, 10);
+
+        setTimeout(() => div.remove(), 3100);
+    }
+}
+
+// --- RESULTAT --- //
+function result(index) {
+    const prize = prizes[index];
+    localStorage.setItem("played", "true");
+
+    document.getElementById("spin").disabled = true;
+    document.getElementById("spin").innerText = "Déjà joué ✔️";
+
+    confetti();
+
+    document.getElementById("popup-text").innerText =
+        `🎉 Bravo ! Vous avez gagné : ${prize.text}\nCode : ${prize.code}`;
+
+    document.getElementById("popup").style.display = "block";
+
+    document.getElementById("copy-btn").onclick = () => {
+        navigator.clipboard.writeText(prize.code);
+        alert("Code copié !");
+    };
+}
+</script>
+</body>
+</html>
