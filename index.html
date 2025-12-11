@@ -40,51 +40,6 @@
         font-size: 16px;
     }
 
-    /* Formulaire en premier */
-    #form-section {
-        margin-bottom: 40px;
-        padding-bottom: 40px;
-        border-bottom: 2px solid #e6e6e6;
-    }
-
-    #form-section h2 {
-        text-align: center;
-        color: #e6696f;
-        margin-bottom: 10px;
-    }
-
-    #form-section p {
-        text-align: center;
-        color: #666;
-        margin-bottom: 20px;
-    }
-
-    .form-container {
-        width: 100%;
-        max-width: 540px;
-        margin: 0 auto;
-    }
-
-    .form-container iframe {
-        display: block;
-        margin: 0 auto;
-        max-width: 100%;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    #wheel-section {
-        opacity: 0.3;
-        pointer-events: none;
-        transition: opacity 0.5s;
-    }
-
-    #wheel-section.active {
-        opacity: 1;
-        pointer-events: all;
-    }
-
     #wheel-container {
         position: relative;
         width: 420px;
@@ -139,29 +94,97 @@
         z-index: 10;
     }
 
-    /* Pop-up */
-    #popup {
+    /* Overlay pour les pop-ups */
+    .overlay {
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        display: none;
-        text-align: center;
-        z-index: 1000;
-        max-width: 90%;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        padding: 20px;
+        box-sizing: border-box;
     }
 
-    #popup h2 {
+    /* Pop-up formulaire */
+    #form-popup {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        text-align: center;
+    }
+
+    #form-popup h2 {
+        color: #e6696f;
+        margin-bottom: 10px;
+    }
+
+    #form-popup p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .form-container iframe {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        border: none;
+        border-radius: 10px;
+    }
+
+    #unlock-btn {
+        display: block;
+        margin: 20px auto 0;
+        padding: 14px 35px;
+        background: #b4c033;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(180,192,51,0.3);
+        transition: all 0.3s;
+    }
+
+    #unlock-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(180,192,51,0.4);
+    }
+
+    /* Pop-up résultat */
+    #result-popup {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    #result-popup h2 {
         color: #e6696f;
         margin-bottom: 20px;
         white-space: pre-line;
+        font-size: 24px;
     }
 
-    #popup button {
+    #result-popup button {
         margin: 10px 5px;
         padding: 12px 24px;
         background: #5b7976;
@@ -173,20 +196,9 @@
         transition: all 0.3s;
     }
 
-    #popup button:hover {
+    #result-popup button:hover {
         background: #4a6663;
         transform: translateY(-2px);
-    }
-
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        z-index: 999;
     }
 
     .confetti {
@@ -195,14 +207,6 @@
         height: 10px;
         background: #f0f;
         z-index: 2000;
-    }
-
-    .lock-message {
-        text-align: center;
-        color: #e6696f;
-        font-weight: bold;
-        margin-top: 10px;
-        font-size: 14px;
     }
 
     @media (max-width: 600px) {
@@ -218,46 +222,48 @@
         h1 {
             font-size: 24px;
         }
+
+        #form-popup {
+            padding: 20px;
+        }
     }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>🎡 Tournez la roue et gagnez !</h1>
-    <p class="subtitle">Inscrivez-vous d'abord pour débloquer la roue</p>
-
-    <!-- FORMULAIRE EN PREMIER -->
-    <div id="form-section">
-        <h2>📧 Étape 1 : Inscrivez-vous</h2>
-        <p>Remplissez le formulaire ci-dessous pour débloquer la roue</p>
+<!-- Pop-up formulaire (affiché au chargement) -->
+<div id="form-overlay" class="overlay">
+    <div id="form-popup">
+        <h2>🎉 Bienvenue !</h2>
+        <p>Inscrivez-vous pour accéder à la roue et tenter de gagner des réductions exclusives !</p>
         <div class="form-container">
             <iframe id="sendinblue-form" width="540" height="305" src="https://8c9f608f.sibforms.com/serve/MUIFALvNrnwn7Kcw3JMAiCQ4VGQXM2LogEhUSDEmeTX_DcmpHV2e4gpkKv3ekiDsH7Yw8hm_LPGN1sUGWGf9yTpDWxAk-TP6U3ACpkfOnynzK3jVGXs9K-bYPgDS-OAIFLziNruAb9aaz6lEOyVKsUTZso_vTzOifxxzNGcuOWNwmrPziYBM4E9jSlybvi8td9YcIZc07rYxDVB7" scrolling="auto" allowfullscreen></iframe>
         </div>
-        <button id="unlock-btn" style="display:block; margin: 20px auto 0; padding: 12px 30px; background: #b4c033; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 5px 15px rgba(180,192,51,0.3); transition: all 0.3s;">✅ J'ai rempli le formulaire - Débloquer la roue</button>
-    </div>
-
-    <!-- ROUE BLOQUÉE AU DÉBUT -->
-    <div id="wheel-section">
-        <h2 style="text-align: center; color: #333; margin-bottom: 20px;">🎯 Étape 2 : Lancez la roue</h2>
-        <p class="lock-message">🔒 Inscrivez-vous pour débloquer</p>
-        
-        <div id="wheel-container">
-            <div id="arrow"></div>
-            <canvas id="wheel" width="420" height="420"></canvas>
-        </div>
-
-        <button id="spin">🎡 Lancer la roue</button>
+        <button id="unlock-btn">✅ J'ai rempli le formulaire - Accéder à la roue</button>
     </div>
 </div>
 
-<div id="overlay"></div>
+<!-- Page principale avec la roue -->
+<div class="container">
+    <h1>🎡 Tournez la roue et gagnez !</h1>
+    <p class="subtitle">Tentez votre chance pour gagner des réductions exclusives</p>
 
-<div id="popup">
-    <h2 id="popup-text"></h2>
-    <button id="copy-btn">📋 Copier le code</button>
-    <button id="close-btn">Fermer</button>
+    <div id="wheel-container">
+        <div id="arrow"></div>
+        <canvas id="wheel" width="420" height="420"></canvas>
+    </div>
+
+    <button id="spin">🎡 Lancer la roue</button>
+</div>
+
+<!-- Pop-up résultat -->
+<div id="result-overlay" class="overlay" style="display: none;">
+    <div id="result-popup">
+        <h2 id="popup-text"></h2>
+        <button id="copy-btn">📋 Copier le code</button>
+        <button id="close-btn">Fermer</button>
+    </div>
 </div>
 
 <script>
@@ -305,13 +311,26 @@ function drawWheel() {
 drawWheel();
 
 // --- DÉBLOCAGE DE LA ROUE --- //
+let clickCount = 0;
 document.getElementById("unlock-btn").onclick = function() {
-    const wheelSection = document.getElementById("wheel-section");
-    wheelSection.classList.add("active");
-    document.querySelector(".lock-message").style.display = "none";
-    this.style.display = "none";
-    alert("🎉 La roue est débloquée ! Vous pouvez maintenant jouer !");
+    clickCount++;
+    
+    // Si première tentative, demander confirmation
+    if (clickCount === 1) {
+        this.innerText = "⚠️ Confirmez-vous avoir rempli le formulaire ?";
+        this.style.background = "#e6696f";
+        return;
+    }
+    
+    // Si deuxième clic, débloquer
+    if (clickCount >= 2) {
+        document.getElementById("form-overlay").style.display = "none";
+        document.body.style.overflow = "auto";
+    }
 };
+
+// Bloquer le scroll quand le pop-up est ouvert
+document.body.style.overflow = "hidden";
 
 // --- SON CLIC CLIC --- //
 const clickSound = new Audio("https://www.soundjay.com/mechanical/sounds/mechanical-clonk-1.mp3");
@@ -321,10 +340,6 @@ let spinning = false;
 
 document.getElementById("spin").onclick = function() {
     if (spinning) return;
-    if (!document.getElementById("wheel-section").classList.contains("active")) {
-        alert("⚠️ Veuillez d'abord vous inscrire et débloquer la roue !");
-        return;
-    }
     spinning = true;
 
     const spins = Math.floor(Math.random() * 2000) + 3000;
@@ -400,8 +415,7 @@ function result(index) {
         document.getElementById("popup-text").innerText =
             `🎉 Félicitations !\n\nVous avez gagné :\n${prize.text}\n\nVotre code promo :\n${prize.code}`;
 
-        document.getElementById("overlay").style.display = "block";
-        document.getElementById("popup").style.display = "block";
+        document.getElementById("result-overlay").style.display = "flex";
     }, 1000);
 
     document.getElementById("copy-btn").onclick = () => {
@@ -414,12 +428,10 @@ function result(index) {
     };
 
     document.getElementById("close-btn").onclick = closePopup;
-    document.getElementById("overlay").onclick = closePopup;
 }
 
 function closePopup() {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("popup").style.display = "none";
+    document.getElementById("result-overlay").style.display = "none";
     spinning = false;
 }
 </script>
