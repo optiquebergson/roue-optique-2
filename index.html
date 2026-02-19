@@ -94,7 +94,6 @@
         z-index: 10;
     }
 
-    /* Overlay pour les pop-ups */
     .overlay {
         position: fixed;
         top: 0;
@@ -110,7 +109,6 @@
         box-sizing: border-box;
     }
 
-    /* Pop-up formulaire */
     #form-popup {
         background: white;
         padding: 30px;
@@ -166,7 +164,6 @@
         box-shadow: 0 7px 20px rgba(180,192,51,0.4);
     }
 
-    /* Pop-up résultat */
     #result-popup {
         background: #ffffff;
         padding: 40px;
@@ -310,23 +307,10 @@ function drawWheel() {
 }
 drawWheel();
 
-// --- DÉBLOCAGE DE LA ROUE --- //
-let clickCount = 0;
+// --- DÉBLOCAGE DE LA ROUE (validation unique) --- //
 document.getElementById("unlock-btn").onclick = function() {
-    clickCount++;
-    
-    // Si première tentative, demander confirmation
-    if (clickCount === 1) {
-        this.innerText = "⚠️ Confirmez-vous avoir rempli le formulaire ?";
-        this.style.background = "#e6696f";
-        return;
-    }
-    
-    // Si deuxième clic, débloquer
-    if (clickCount >= 2) {
-        document.getElementById("form-overlay").style.display = "none";
-        document.body.style.overflow = "auto";
-    }
+    document.getElementById("form-overlay").style.display = "none";
+    document.body.style.overflow = "auto";
 };
 
 // Bloquer le scroll quand le pop-up est ouvert
